@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>🔒 Téléphone piraté</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: black;
+      color: red;
+      font-family: monospace;
+      text-align: center;
+      height: 100%;
+      overflow: hidden;
+    }
+    #message {
+      background-color: #220000;
+      color: orange;
+      padding: 15px;
+      font-size: 18px;
+    }
+    #container {
+      padding-top: 20px;
+    }
+    video {
+      margin-top: 20px;
+      width: 80%;
+      border: 5px solid red;
+    }
+    h1 {
+      margin-top: 40px;
+      font-size: 28px;
+    }
+    p {
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body oncontextmenu="return false" onkeydown="return false" onmousedown="return false">
+  <div id="message">
+    🔒 Ce système est en mode défense.<br>
+    Veuillez autoriser la caméra pour finaliser l’analyse de sécurité.<br>
+    Refuser l’accès peut entraîner un formatage automatique.
+  </div>
+
+  <div id="container">
+    <h1>⚠️ TÉLÉPHONE PIRATÉ ⚠️</h1>
+    <p>Formatage automatique dans : <span id="timer">120</span> secondes</p>
+    <p>Caméra activée. Enregistrement en cours...</p>
+    <video id="video" autoplay muted playsinline></video>
+  </div>
+
+  <!-- 🔊 Alarme en boucle -->
+  <audio id="alarme" autoplay loop>
+    <source src="alarm.mp3" type="audio/mpeg">
+    Votre navigateur ne supporte pas l’audio.
+  </audio>
+
+  <script>
+    // Empêche touches et clics
+    document.addEventListener("keydown", e => e.preventDefault());
+    document.addEventListener("touchstart", e => e.preventDefault(), { passive: false });
+
+    // Plein écran
+    function openFullscreen() {
+      const docElm = document.documentElement;
+      if (docElm.requestFullscreen) docElm.requestFullscreen();
+      else if (docElm.webkitRequestFullscreen) docElm.webkitRequestFullscreen();
+      else if (docElm.msRequestFullscreen) docElm.msRequestFullscreen();
+    }
+    openFullscreen();
+
+    // Synthèse vocale
+    const voix = new SpeechSynthesisUtterance("Téléphone piraté. Caméra activée. Formatage dans deux minutes.");
+    voix.lang = "fr-FR";
+    voix.rate = 0.9;
+    speechSynthesis.speak(voix);
+
+    // Caméra
+    const video = document.getElementById('video');
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        video.srcObject = stream;
+      })
+      .catch(error => {
+        document.getElementById("message").innerHTML = "❌ Caméra non autorisée. Formatage forcé dans 2 minutes.";
+      });
+
+    // Compte à rebours
+    let temps = 120;
+    const timer = document.getElementById("timer");
+    const interval = setInterval(() => {
+      temps--;
+      timer.innerText = temps;
+      if (temps <= 0) {
+        clearInterval(interval);
+        document.body.innerHTML = "<h1 style='color:lime;'>✅ Formatage annulé</h1>";
+        speechSynthesis.speak(new SpeechSynthesisUtterance("Formatage annulé. Le système est sauf."));
+        document.getElementById("alarme").pause();
+      }
+    }, 1000);
+  </script>
+</body>
+</html>
